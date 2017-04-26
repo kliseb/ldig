@@ -81,5 +81,6 @@ Documents
 Copyright & License
 -----
 - (c)2011-2012 Nakatani Shuyo / Cybozu Labs Inc. All rights reserved.
+- (c) 2017 Demonchy Clement. All rights reserved
 - All codes and resources are available under the MIT License.
 

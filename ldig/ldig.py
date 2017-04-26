@@ -4,14 +4,21 @@
 # ldig : Language Detector with Infinite-Gram
 # This code is available under the MIT License.
 # (c)2011 Nakatani Shuyo / Cybozu Labs Inc.
+from __future__ import absolute_import, unicode_literals
 
 import os, sys, re, codecs, json
 import optparse
 import numpy
-import htmlentitydefs
 import subprocess
-import da
+from ldig import da
+#python2/3 import
+try:
+    import htmlentitydefs
+except:
+    import html.entities as htmlentitydefs
+import logging
 
+logger = logging.getLogger(__name__)
 
 class ldig(object):
     def __init__(self, model_dir):
@@ -68,11 +75,11 @@ class ldig(object):
                         f.write("\n")
 
         labels.sort()
-        print "labels: %d" % len(labels)
+        logger.info("labels: %d" % len(labels))
         with open(self.labels, 'wb') as f:
             f.write(json.dumps(labels))
 
-        print "generating max-substrings..."
+        logger.info("generating max-substrings...")
         temp_features = self.features + ".temp"
         maxsubst = options.maxsubst
         if os.name == 'nt': maxsubst += ".exe"
@@ -91,7 +98,7 @@ class ldig(object):
                 if c >= lbff and len(st) <= ngram_bound and (not r1.search(st)) and r2.search(st) and (st[0] != u'\u0001' or st[-1] != u'\u0001'):
                     M += 1
                     features.append((st, line))
-        print "# of features = %d" % M
+        logger.info("# of features = %d" % M)
 
         features.sort()
         with codecs.open(self.features, 'wb', 'utf-8') as f:
@@ -108,7 +115,7 @@ class ldig(object):
 
         list = (numpy.abs(param).sum(1) > 0.0000001)
         new_param = param[list]
-        print "# of features : %d => %d" % (param.shape[0], new_param.shape[0])
+        logger.info("# of features : %d => %d" % (param.shape[0], new_param.shape[0]))
 
         numpy.save(self.param, new_param)
         new_features = []
@@ -129,18 +136,18 @@ class ldig(object):
         for st in args:
             label, text, org_text = normalize_text(st)
             events = trie.extract_features(u"\u0001" + text + u"\u0001")
-            print "orig: '%s'" % st
-            print "norm: '%s'" % text
+            logger.info("orig: '%s'" % st)
+            logger.info("norm: '%s'" % text)
             sum = numpy.zeros(len(labels))
-            print "id\tfeat\tfreq\t%s" % "\t".join(labels)
+            logger.info("id\tfeat\tfreq\t%s" % "\t".join(labels))
             for id in sorted(events, key=lambda id:features[id][0]):
                 phi = param[id,]
                 sum += phi * events[id]
-                print "%d\t%s\t%d\t%s" % (id,features[id][0], events[id], "\t".join(["%0.2f" % x for x in phi]))
+                logger.info("%d\t%s\t%d\t%s" % (id,features[id][0], events[id], "\t".join(["%0.2f" % x for x in phi])))
             exp_w = numpy.exp(sum - sum.max())
             prob = exp_w / exp_w.sum()
-            print "\t\t\t%s" % "\t".join(["%0.2f" % x for x in sum])
-            print "\t\t\t%s" % "\t".join(["%0.1f%%" % (x * 100) for x in prob])
+            logger.info("\t\t\t%s" % "\t".join(["%0.2f" % x for x in sum]))
+            logger.info("\t\t\t%s" % "\t".join(["%0.1f%%" % (x * 100) for x in prob]))
 
     def learn(self, options, args):
         trie = self.load_da()
@@ -148,11 +155,11 @@ class ldig(object):
         labels = self.load_labels()
 
         import time
-        print "loading corpus... " + time.strftime("%H:%M:%S", time.localtime())
+        logger.info("loading corpus... " + time.strftime("%H:%M:%S", time.localtime()))
         corpus, idlist = load_corpus(args, labels)
-        print "inference... " + time.strftime("%H:%M:%S", time.localtime())
+        logger.info("inference... " + time.strftime("%H:%M:%S", time.localtime()))
         inference(param, labels, corpus, idlist, trie, options)
-        print "finish... " + time.strftime("%H:%M:%S", time.localtime())
+        logger.info("finish... " + time.strftime("%H:%M:%S", time.localtime()))
         numpy.save(self.param, param)
 
     def detect(self, options, args):
@@ -354,7 +361,7 @@ def inference(param, labels, corpus, idlist, trie, options):
         if options.reg_const:
             indexes = events
             if (N - m) % WHOLE_REG_INT == 1:
-                print "full regularization: %d / %d" % (m, N)
+                logger.info("full regularization: %d / %d" % (m, N))
                 indexes = xrange(M)
             for id in indexes:
                 prm = param[id]
@@ -385,10 +392,10 @@ def inference(param, labels, corpus, idlist, trie, options):
 
     for lbl, crct, cnt in zip(labels, corrects, counts):
         if cnt > 0:
-            print ">    %s = %d / %d = %.2f" % (lbl, crct, cnt, 100.0 * crct / cnt)
-    print "> total = %d / %d = %.2f" % (corrects.sum(), N, 100.0 * corrects.sum() / N)
+            logger.info(">    %s = %d / %d = %.2f" % (lbl, crct, cnt, 100.0 * crct / cnt))
+    logger.info("> total = %d / %d = %.2f" % (corrects.sum(), N, 100.0 * corrects.sum() / N))
     list = (numpy.abs(param).sum(1) > 0.0000001)
-    print "> # of relevant features = %d / %d" % (list.sum(), M)
+    logger.info("> # of relevant features = %d / %d" % (list.sum(), M))
 
 
 def likelihood(param, labels, trie, filelist, options):
@@ -423,7 +430,7 @@ def likelihood(param, labels, trie, filelist, options):
 
             predict_lang = labels[predict_k]
             if y[predict_k] < 0.6: predict_lang = ""
-            print "%s\t%s\t%s" % (label, predict_lang, org_text)
+            logger.info("%s\t%s\t%s" % (label, predict_lang, org_text))
         f.close()
 
     if n_available_data > 0:
@@ -431,9 +438,9 @@ def likelihood(param, labels, trie, filelist, options):
 
         for lbl, crct, cnt in zip(labels, corrects, counts):
             if cnt > 0:
-                print ">    %s = %d / %d = %.2f" % (lbl, crct, cnt, 100.0 * crct / cnt)
-        print "> total = %d / %d = %.2f" % (corrects.sum(), n_available_data, 100.0 * corrects.sum() / n_available_data)
-        print "> average negative log likelihood = %.3f" % log_likely
+                logger.info(">    %s = %d / %d = %.2f" % (lbl, crct, cnt, 100.0 * crct / cnt))
+        logger.info("> total = %d / %d = %.2f" % (corrects.sum(), n_available_data, 100.0 * corrects.sum() / n_available_data))
+        logger.info("> average negative log likelihood = %.3f" % log_likely)
 
     return log_likely
 
@@ -502,5 +509,3 @@ if __name__ == '__main__':
         detector.detect(options, args)
         #import cProfile
         #cProfile.runctx('detector.detect(options, args)', globals(), locals(), 'ldig.profile')
-
-

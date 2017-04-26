@@ -1,8 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import, unicode_literals
 
 import collections
 import numpy
+import logging
+
+logger = logging.getLogger(__name__)
 
 # Double Array for static ordered data
 # This code is available under the MIT License.
@@ -16,7 +20,7 @@ class DoubleArray(object):
         pre = ""
         for i, line in enumerate(list):
             if pre >= line:
-                raise Exception, "list has not ascent order at %d" % (i+1)
+                raise Exception("list has not ascent order at %d" % (i+1))
             pre = line
 
     def initialize(self, list):
@@ -101,7 +105,7 @@ class DoubleArray(object):
     def log(self, format, param):
         if self.verbose:
             import time
-            print "-- %s, %s" % (time.strftime("%Y/%m/%d %H:%M:%S"), format % param)
+            logger.info("-- %s, %s" % (time.strftime("%Y/%m/%d %H:%M:%S"), format % param))
 
     def save(self, filename):
         numpy.savez(filename, base=self.base, check=self.check, value=self.value)

@@ -6,7 +6,7 @@
 # (c)2012 Nakatani Shuyo / Cybozu Labs Inc.
 
 import unittest
-import ldig
+from ldig import ldig
 
 class TestNormalization(unittest.TestCase):
     """Normalization test"""
@@ -39,4 +39,3 @@ if __name__ == '__main__':
     import sys, codecs
     sys.stdout = codecs.getwriter('utf-8')(sys.stdout)
     unittest.main()
-
