@@ -8,7 +8,7 @@ setup(name='ldig',
       license='MIT',
       packages=find_packages(),
       install_requires=[
-        
+          "typing"  
       ],
       test_suite='nose.collector',
       zip_safe=False)
