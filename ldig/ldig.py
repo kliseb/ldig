@@ -5,23 +5,32 @@
 # This code is available under the MIT License.
 # (c)2011 Nakatani Shuyo / Cybozu Labs Inc.
 from __future__ import absolute_import, unicode_literals
-
 import os, sys, re, codecs, json
 import optparse
 import numpy
 import subprocess
 from ldig import da
+import logging
+from typing import Tuple, List
 #python2/3 import
 try:
     import htmlentitydefs
-except:
+except ImportError:
     import html.entities as htmlentitydefs
-import logging
 
 logger = logging.getLogger(__name__)
 
+PATH_SCRIPT = os.path.dirname(os.path.realpath(__file__))
 class ldig(object):
-    def __init__(self, model_dir):
+    def __init__(self, model_dir=os.path.join(PATH_SCRIPT,"models/model.latin.20120315.tar.xz")):
+        if("tar.xz" in model_dir or "tgz" in model_dir):
+            tmp_model = "/tmp/model/"
+            subprocess.call(["mkdir","-p", tmp_model])
+            subprocess.call(["tar","xf", model_dir , "--directory", tmp_model])
+            if("tar.xz" in model_dir):
+                model_dir = tmp_model + "model.latin"
+            else:
+                model_dir = tmp_model + "model.small"
         self.features = os.path.join(model_dir, 'features')
         self.labels = os.path.join(model_dir, 'labels.json')
         self.param = os.path.join(model_dir, 'parameters.npy')
@@ -162,14 +171,23 @@ class ldig(object):
         logger.info("finish... " + time.strftime("%H:%M:%S", time.localtime()))
         numpy.save(self.param, param)
 
-    def detect(self, options, args):
+    def detect_file(self, files_path):
+        #type: List[str] -> List[Tuple[float,str]]
         trie = self.load_da()
         param = numpy.load(self.param)
         labels = self.load_labels()
 
-        log_likely = likelihood(param, labels, trie, args, options)
+        return likelihood_file(param, labels, trie, files_path)
 
 
+    def detect_text(self, text):
+        #type: str -> Tuple[float,str]
+        trie = self.load_da()
+        param = numpy.load(self.param)
+        labels = self.load_labels()
+
+        return likelihood_text(param, labels, trie, text)
+        
 
 
 # from http://www.programming-magic.com/20080820002254/
@@ -398,7 +416,7 @@ def inference(param, labels, corpus, idlist, trie, options):
     logger.info("> # of relevant features = %d / %d" % (list.sum(), M))
 
 
-def likelihood(param, labels, trie, filelist, options):
+def likelihood_file(param, labels, trie, filelist):
     K = len(labels)
     corrects = numpy.zeros(K, dtype=int)
     counts = numpy.zeros(K, dtype=int)
@@ -407,6 +425,7 @@ def likelihood(param, labels, trie, filelist, options):
 
     n_available_data = 0
     log_likely = 0.0
+    prob_and_label = list()
     for filename in filelist:
         f = codecs.open(filename, 'rb',  'utf-8')
         for i, s in enumerate(f):
@@ -429,8 +448,10 @@ def likelihood(param, labels, trie, filelist, options):
                     corrects[predict_k] += 1
 
             predict_lang = labels[predict_k]
-            if y[predict_k] < 0.6: predict_lang = ""
+            if y[predict_k] < 0.6: 
+                predict_lang = ""
             logger.info("%s\t%s\t%s" % (label, predict_lang, org_text))
+            prob_and_label.append((y[predict_k],predict_lang))
         f.close()
 
     if n_available_data > 0:
@@ -442,15 +463,57 @@ def likelihood(param, labels, trie, filelist, options):
         logger.info("> total = %d / %d = %.2f" % (corrects.sum(), n_available_data, 100.0 * corrects.sum() / n_available_data))
         logger.info("> average negative log likelihood = %.3f" % log_likely)
 
-    return log_likely
+    return prob_and_label
+
+
+def likelihood_text(param, labels, trie, text):
+    K = len(labels)
+    corrects = numpy.zeros(K, dtype=int)
+    counts = numpy.zeros(K, dtype=int)
+
+    label_map = dict((x, i) for i, x in enumerate(labels))
+
+    n_available_data = 0
+    log_likely = 0.0
+    label, text, org_text = normalize_text(text)
+    if label not in label_map:
+        sys.stderr.write("WARNING : unknown label '%s' (ignore the later same labels)\n" % (label))
+        label_map[label] = -1
+    label_k = label_map[label]
+
+    events = trie.extract_features(u"\u0001" + text + u"\u0001")
+    y = predict(param, events)
+    predict_k = y.argmax()
+
+    if label_k >= 0:
+        log_likely -= numpy.log(y[label_k])
+        n_available_data += 1
+        counts[label_k] += 1
+        if label_k == predict_k and y[predict_k] >= 0.6:
+            corrects[predict_k] += 1
+
+    predict_lang = labels[predict_k]
+    if y[predict_k] < 0.6: 
+        predict_lang = ""
+        logger.info("%s\t%s\t%s" % (label, predict_lang, org_text))
+
+    if n_available_data > 0:
+        log_likely /= n_available_data
+
+        for lbl, crct, cnt in zip(labels, corrects, counts):
+            if cnt > 0:
+                logger.info(">    %s = %d / %d = %.2f" % (lbl, crct, cnt, 100.0 * crct / cnt))
+        logger.info("> total = %d / %d = %.2f" % (corrects.sum(), n_available_data, 100.0 * corrects.sum() / n_available_data))
+        logger.info("> average negative log likelihood = %.3f" % log_likely)
+
+    return log_likely,predict_lang
+
 
 
 def generate_doublearray(file, features):
     trie = da.DoubleArray()
     trie.initialize(features)
     trie.save(file)
-
-
 
 
 if __name__ == '__main__':
@@ -506,6 +569,6 @@ if __name__ == '__main__':
         detector.learn(options, args)
 
     else:
-        detector.detect(options, args)
+        detector.detect_file(args)
         #import cProfile
         #cProfile.runctx('detector.detect(options, args)', globals(), locals(), 'ldig.profile')
