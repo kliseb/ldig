@@ -1,0 +1,2 @@
+include ldig/models/*.tar.xz
+include ldig/models/*.tgz
