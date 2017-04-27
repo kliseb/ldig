@@ -24,13 +24,13 @@ PATH_SCRIPT = os.path.dirname(os.path.realpath(__file__))
 class ldig(object):
     def __init__(self, model_dir=os.path.join(PATH_SCRIPT,"models/model.latin.20120315.tar.xz")):
         if("tar.xz" in model_dir or "tgz" in model_dir):
-            tmp_model = "/tmp/model/"
+            tmp_model = os.path.join(PATH_SCRIPT,"models/")
             subprocess.call(["mkdir","-p", tmp_model])
             subprocess.call(["tar","xf", model_dir , "--directory", tmp_model])
             if("tar.xz" in model_dir):
-                model_dir = tmp_model + "model.latin"
+                model_dir = os.path.join(tmp_model, "model.latin")
             else:
-                model_dir = tmp_model + "model.small"
+                model_dir = os.path.join(tmp_model,"model.small")
         self.features = os.path.join(model_dir, 'features')
         self.labels = os.path.join(model_dir, 'labels.json')
         self.param = os.path.join(model_dir, 'parameters.npy')
