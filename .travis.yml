@@ -11,6 +11,13 @@ python:
   - "3.7-dev" # 3.7 development branch
   - "nightly" # currently points to 3.7-dev
 # command to install dependencies
-install: "pip install nose"
+install: "pip install nose codeclimate-test-reporter"
 # command to run tests
 script: python setup.py nosetests
+addons:
+  code_climate:
+    repo_token:
+      secure: "RihoqVhy7Jp5tiduXuNcenmhlQWXHrBt0KKNQ0i8cpkHOiDXse5gCAu9o68jBfAGGlilOqff5OTtEv3yHQM5iXVxPxJWqbY7fM2hHbanI0fPRxsSWBbZP8/hiT8iE8CYmLhoLsTqFSK5tJpKUc3tNZAsb99hWfICvTq/H/+BJrr+U5MsvGNtfeP3VnZYqCIVnOLEol4KKzuv2SL6B+2VHuxhAQkXNNgmv5U62DYyxEDAjeDZFynHYpNcW/C4REsE6H33jtMixuUTGvPWMsW1eXhxyCcGKk1WrJXCSna9MRo6P/3+L8dwddTR1CliozqPDiAYQv2HKWCZ30ID53xvbvN+A+ZnKsRNi1/vnv3Q2rqSgGVRgv34+6XEdNfC+Vp0U82nfc01VAE7kvlOKA+UAI5TkSXQcwKDQdRawi1qa+WLuyrD5SYBULarxAxdnkxxWO6XLzaYlaw2taB9m98uhDQsjAtbOl6dBsd+P4lfnaGssnAqmwk8zzQWEPKLBg2zL7LYwsBeHtGgeS0cYUPpX+Bp3xi73zt5gTEmFEgQ2GUrFVxl2JncPooFksxa3OLS4LxaDRQTZpGq6gXsNzQlPl5tkDYM3olu68zOn3adevcDqjMuQpQ6s9DyfKmKNYUT1x+wkTeb/d9DM/M06pCM/hmK5OMgNdeAih/KZq61kgM="
+
+after_sucess:
+  - CODECLIMATE_REPO_TOKEN=CODE_CLIMATE codeclimate-test-reporter
