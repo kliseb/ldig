@@ -1,8 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+# Testcase of da
+# This code is available under the MIT License.
+# (c)2012 Nakatani Shuyo / Cybozu Labs Inc.
+# (c) 2017 Demonchy Clement
 
+from __future__ import absolute_import, unicode_literals
 import unittest
-import da
+from ldig import da
 
 class TestDoubleArray(unittest.TestCase):
     def test1(self):
@@ -25,9 +30,6 @@ class TestDoubleArray(unittest.TestCase):
     def test3(self):
         trie = da.DoubleArray(verbose=False)
         trie.initialize(["ca", "cat", "deer", "dog", "fox", "rat"])
-        print trie.base
-        print trie.check
-        print trie.value
         self.assertEqual(trie.N, 17)
         self.assert_(trie.get("c") is None)
         self.assertEqual(trie.get("ca"), 0)
@@ -57,5 +59,6 @@ class TestDoubleArray(unittest.TestCase):
         self.assertEqual(r[2], 1)
         self.assertEqual(r[5], 1)
 
-unittest.main()
+if __name__ == "__main__":
+    unittest.main()
 
