@@ -20,8 +20,6 @@ except ImportError:
     import html.entities as htmlentitydefs
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.ERROR)
-logger.addHandler(logging.StreamHandler())
 
 PATH_SCRIPT = os.path.dirname(os.path.realpath(__file__))
 class ldig(object):
