@@ -12,6 +12,7 @@ import subprocess
 from ldig import da
 import logging
 from typing import Tuple, List
+import zipfile
 #python2/3 import
 try:
     import htmlentitydefs
@@ -19,18 +20,20 @@ except ImportError:
     import html.entities as htmlentitydefs
 
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.ERROR)
+logger.addHandler(logging.StreamHandler())
 
 PATH_SCRIPT = os.path.dirname(os.path.realpath(__file__))
 class ldig(object):
-    def __init__(self, model_dir=os.path.join(PATH_SCRIPT,"models/model.latin.20120315.tar.xz")):
-        if("tar.xz" in model_dir or "tgz" in model_dir):
-            tmp_model = os.path.join(PATH_SCRIPT,"models/")
-            subprocess.call(["mkdir","-p", tmp_model])
-            subprocess.call(["tar","xf", model_dir , "--directory", tmp_model])
-            if("tar.xz" in model_dir):
-                model_dir = os.path.join(tmp_model, "model.latin")
-            else:
-                model_dir = os.path.join(tmp_model,"model.small")
+    def __init__(self, model_dir=os.path.join(PATH_SCRIPT,"models/model.latin.20120315.zip")):
+        """
+        expect full path of model directory or zip file
+        """
+        if(".zip" in model_dir):
+            with zipfile.ZipFile(model_dir,"r") as model_compressed:
+                #remove zip extension for path
+                model_dir = model_dir[:-4]
+                model_compressed.extractall(model_dir) 
         self.features = os.path.join(model_dir, 'features')
         self.labels = os.path.join(model_dir, 'labels.json')
         self.param = os.path.join(model_dir, 'parameters.npy')
