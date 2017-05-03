@@ -36,8 +36,11 @@ class ldig(object):
                 model_compressed.extractall(model_dir) 
         self.features = os.path.join(model_dir, 'features')
         self.labels = os.path.join(model_dir, 'labels.json')
+        self.default_labels = self.load_labels()
         self.param = os.path.join(model_dir, 'parameters.npy')
+        self.default_param = numpy.load(self.param)
         self.doublearray = os.path.join(model_dir, 'doublearray.npz')
+        self.default_trie = self.load_da()
 
     def load_da(self):
         trie = da.DoubleArray()
@@ -185,11 +188,7 @@ class ldig(object):
 
     def detect_text(self, text):
         #type: str -> Tuple[float,str]
-        trie = self.load_da()
-        param = numpy.load(self.param)
-        labels = self.load_labels()
-
-        return likelihood_text(param, labels, trie, text)
+        return likelihood_text(self.default_param, self.default_labels, self.default_trie, text)
         
 
 
