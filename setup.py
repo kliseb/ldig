@@ -6,7 +6,6 @@ setup(name='ldig',
       author='Nakatani Shuyo, Clement Demonchy',
       author_email='demonchy.clement@gmail.com',
       license='MIT',
-      include_package_data=True,
       packages=find_packages(),
       install_requires=[
           "typing"  
