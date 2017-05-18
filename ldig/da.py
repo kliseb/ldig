@@ -108,7 +108,7 @@ class DoubleArray(object):
             logger.info("-- %s, %s" % (time.strftime("%Y/%m/%d %H:%M:%S"), format_log % param))
 
     def save(self, filename):
-        numpy.savez(filename, base=self.base, check=self.check, value=self.value)
+        numpy.save(filename, base=self.base, check=self.check, value=self.value)
 
     def load(self, filename):
         with numpy.load(filename) as loaded:
