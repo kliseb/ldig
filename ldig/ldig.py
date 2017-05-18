@@ -477,7 +477,7 @@ def likelihood_text(param, labels, trie, text):
     log_likely = 0.0
     label, text, org_text = normalize_text(text)
     if label not in label_map:
-        logger.warning("WARNING : unknown label '%s' (ignore the later same labels)\n" % (label))
+        #logger.warning("WARNING : unknown label '%s' (ignore the later same labels)\n" % (label))
         label_map[label] = -1
     label_k = label_map[label]
 
