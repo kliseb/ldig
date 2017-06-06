@@ -219,7 +219,9 @@ def htmlentity2unicode(text):
 
 def normalize_twitter(text):
     """normalization for twitter"""
-    text = re.sub(r'(@|#|https?:\/\/)[^ ]+', '', text)
+    text = re.sub(r'(@|#)[^ ]+', '', text)
+    #remove whole url is simpler too have more coherent result
+    text = re.sub(r'(https|http)?:\/\/(\w|\.|\/|\?|\=|\&|\%)*\b', '', text)
     text = re.sub(r'(^| )[:;x]-?[\(\)dop]($| )', ' ', text)  # facemark
     text = re.sub(r'(^| )(rt[ :]+)*', ' ', text)
     text = re.sub(r'([hj])+([aieo])+(\1+\2+){1,}', r'\1\2\1\2', text, re.IGNORECASE)  # laugh
