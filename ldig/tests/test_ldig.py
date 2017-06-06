@@ -39,6 +39,8 @@ class TestLdig(unittest.TestCase):
         self.assertEqual(ldig_object.detect_text("Coucou")[1],"fr")
         self.assertEqual(ldig_object.detect_text("CABOSUN Trial of Upfront Cabozantinib in Metastatic RCC http://ht.ly/P4tr30b4tTr")[1],"en")
         self.assertEqual(ldig_object.detect_text("@dr_l_alexandre C est de l acromegalie, non ?")[1],"fr")
+        # text too small, so url need to be remove else it will fail
+        self.assertEqual(ldig_object.detect_text(" acromégalie. https://t.co/JncayILmyG")[1],"fr")
 
     def testDetectLangInFile(self):
         ldig_object = ldig.ldig()
