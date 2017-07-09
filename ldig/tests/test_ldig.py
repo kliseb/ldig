@@ -46,8 +46,6 @@ class TestLdig(unittest.TestCase):
         #try to detect crash that happen randomly when initialising ldig and more precisly load_da
         for i in range(20):
             ldig.ldig()
-
-    def testMultipleInit(self):
-        ldig_object = ldig.ldig()
+            
 if __name__ == '__main__':
     unittest.main()
