@@ -42,10 +42,12 @@ class TestLdig(unittest.TestCase):
         # text too small, so url need to be remove else it will fail
         self.assertEqual(ldig_object.detect_text(" acromégalie. https://t.co/JncayILmyG")[1],"fr")
 
-    def testDetectLangInFile(self):
+    def testMultipleInit(self):
+        #try to detect crash that happen randomly when initialising ldig and more precisly load_da
+        for i in range(20):
+            ldig.ldig()
+
+    def testMultipleInit(self):
         ldig_object = ldig.ldig()
-        prob_and_lang = ldig_object.detect_file([os.path.join(PATH_SCRIPT ,"data/tweets.txt")])
-        lang = [p_a_l[1] for p_a_l in prob_and_lang]
-        self.assertListEqual(lang,["fr","tr","fr","en","en","en","en","en","en","fr","en","en","fr","fr","fr","fr","fr","fr","sv","fr"])
 if __name__ == '__main__':
     unittest.main()
