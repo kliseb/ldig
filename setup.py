@@ -9,7 +9,7 @@ setup(name='ldig',
       include_package_data=True,
       packages=find_packages(),
       install_requires=[
-          "typing"  
+          "typing","numpy==1.12.1"
       ],
       test_suite='nose.collector',
       zip_safe=False)
