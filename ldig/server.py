@@ -72,5 +72,5 @@ class LdigServerHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             self.end_headers()
 
 server = BaseHTTPServer.HTTPServer(('', options.port), LdigServerHandler)
-print "ready."
+print("ready.")
 server.serve_forever()

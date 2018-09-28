@@ -86,9 +86,9 @@ class DoubleArray(object):
         if self.N < max_cand:
             new_N = 2 ** int(numpy.ceil(numpy.log2(max_cand)))
             self.log("extend DA : %d => (%d) => %d", (self.N, max_cand, new_N))
-            self.base.extend(    n - 1 for n in xrange(self.N, new_N))
-            self.check.extend( - n - 1 for n in xrange(self.N, new_N))
-            self.value.extend(     - 1 for n in xrange(self.N, new_N))
+            self.base.extend(    n - 1 for n in range(self.N, new_N))
+            self.check.extend( - n - 1 for n in range(self.N, new_N))
+            self.value.extend(     - 1 for n in range(self.N, new_N))
             self.N = new_N
 
     def shrink_array(self, max_index):
@@ -155,9 +155,9 @@ class DoubleArray(object):
         base = self.base
         check = self.check
         value = self.value
-        for i in xrange(l):
+        for i in range(l):
             pointer = 0
-            for j in xrange(i, l):
+            for j in range(i, l):
                 next_element = base[pointer] + clist[j]
                 if next_element >= N or check[next_element] != pointer: break
                 id_value = value[next_element]
