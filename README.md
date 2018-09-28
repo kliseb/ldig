@@ -1,6 +1,7 @@
 ldig (Language Detection with Infinity Gram)
 ======================
 
+Updated for Python3
 
 This is a prototype of language detection for short message service (twitter).
 with 99.1% accuracy for 17 languages
@@ -9,13 +10,12 @@ with 99.1% accuracy for 17 languages
 Usage
 ------
 
-1. Extract model directory
-    tar xf models/[select model archive]
-
-2. Detect
-    ldig.py -m [model directory] [text data file]
-
-
+  1. Install with setup.py install
+  2. import ldig from ldig
+  3. lmodel = ldig()
+  4. ldig.detect_text(some text)
+  
+  
 Data format
 ------
 
