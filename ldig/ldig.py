@@ -4,7 +4,7 @@
 # ldig : Language Detector with Infinite-Gram
 # This code is available under the MIT License.
 # (c)2011 Nakatani Shuyo / Cybozu Labs Inc.
-from __future__ import absolute_import, unicode_literals
+
 import os, sys, re, codecs, json
 import optparse
 import numpy
@@ -17,7 +17,7 @@ import time
 
 # python2/3 import
 try:
-    import htmlentitydefs
+    import html.entities
 except ImportError:
     import html.entities as htmlentitydefs
 
@@ -104,15 +104,15 @@ class ldig(object):
         # count features
         M = 0
         features = []
-        r1 = re.compile(u'.\u0001.')
-        r2 = re.compile(u'[A-Za-z\u00a1-\u00a3\u00bf-\u024f\u1e00-\u1eff]')
+        r1 = re.compile('.\u0001.')
+        r2 = re.compile('[A-Za-z\u00a1-\u00a3\u00bf-\u024f\u1e00-\u1eff]')
         with codecs.open(temp_features, 'rb', 'utf-8') as f:
             for line in f:
                 i = line.index('\t')
                 st = line[0:i]
                 c = int(line[i + 1:-1])
                 if c >= lbff and len(st) <= ngram_bound and (not r1.search(st)) and r2.search(st) and (
-                        st[0] != u'\u0001' or st[-1] != u'\u0001'):
+                        st[0] != '\u0001' or st[-1] != '\u0001'):
                     M += 1
                     features.append((st, line))
         logger.info("# of features = %d" % M)
@@ -152,7 +152,7 @@ class ldig(object):
 
         for st in arguments:
             _, text, _ = normalize_text(st)
-            events = trie.extract_features(u"\u0001" + text + u"\u0001")
+            events = trie.extract_features("\u0001" + text + "\u0001")
             logger.info("orig: '%s'" % st)
             logger.info("norm: '%s'" % text)
             sum_labels = numpy.zeros(len(labels))
@@ -199,7 +199,7 @@ num10_regex = re.compile(r'#\d+', re.IGNORECASE)
 
 
 def htmlentity2unicode(text):
-    result = u''
+    result = ''
     i = 0
     while True:
         match = reference_regex.search(text, i)
@@ -211,12 +211,12 @@ def htmlentity2unicode(text):
         i = match.end()
         name = match.group(1)
 
-        if name in htmlentitydefs.name2codepoint.keys():
-            result += unichr(htmlentitydefs.name2codepoint[name])
+        if name in list(html.entities.name2codepoint.keys()):
+            result += chr(html.entities.name2codepoint[name])
         elif num16_regex.match(name):
-            result += unichr(int(u'0' + name[1:], 16))
+            result += chr(int('0' + name[1:], 16))
         elif num10_regex.match(name):
-            result += unichr(int(name[1:]))
+            result += chr(int(name[1:]))
     return result
 
 
@@ -233,47 +233,47 @@ def normalize_twitter(text):
 
 
 re_ignore_i = re.compile(r'[^I]')
-re_turkish_alphabet = re.compile(u'[\u011e\u011f\u0130\u0131]')
+re_turkish_alphabet = re.compile('[\u011e\u011f\u0130\u0131]')
 vietnamese_norm = {
-    u'\u0041\u0300': u'\u00C0', u'\u0045\u0300': u'\u00C8', u'\u0049\u0300': u'\u00CC', u'\u004F\u0300': u'\u00D2',
-    u'\u0055\u0300': u'\u00D9', u'\u0059\u0300': u'\u1EF2', u'\u0061\u0300': u'\u00E0', u'\u0065\u0300': u'\u00E8',
-    u'\u0069\u0300': u'\u00EC', u'\u006F\u0300': u'\u00F2', u'\u0075\u0300': u'\u00F9', u'\u0079\u0300': u'\u1EF3',
-    u'\u00C2\u0300': u'\u1EA6', u'\u00CA\u0300': u'\u1EC0', u'\u00D4\u0300': u'\u1ED2', u'\u00E2\u0300': u'\u1EA7',
-    u'\u00EA\u0300': u'\u1EC1', u'\u00F4\u0300': u'\u1ED3', u'\u0102\u0300': u'\u1EB0', u'\u0103\u0300': u'\u1EB1',
-    u'\u01A0\u0300': u'\u1EDC', u'\u01A1\u0300': u'\u1EDD', u'\u01AF\u0300': u'\u1EEA', u'\u01B0\u0300': u'\u1EEB',
+    '\u0041\u0300': '\u00C0', '\u0045\u0300': '\u00C8', '\u0049\u0300': '\u00CC', '\u004F\u0300': '\u00D2',
+    '\u0055\u0300': '\u00D9', '\u0059\u0300': '\u1EF2', '\u0061\u0300': '\u00E0', '\u0065\u0300': '\u00E8',
+    '\u0069\u0300': '\u00EC', '\u006F\u0300': '\u00F2', '\u0075\u0300': '\u00F9', '\u0079\u0300': '\u1EF3',
+    '\u00C2\u0300': '\u1EA6', '\u00CA\u0300': '\u1EC0', '\u00D4\u0300': '\u1ED2', '\u00E2\u0300': '\u1EA7',
+    '\u00EA\u0300': '\u1EC1', '\u00F4\u0300': '\u1ED3', '\u0102\u0300': '\u1EB0', '\u0103\u0300': '\u1EB1',
+    '\u01A0\u0300': '\u1EDC', '\u01A1\u0300': '\u1EDD', '\u01AF\u0300': '\u1EEA', '\u01B0\u0300': '\u1EEB',
 
-    u'\u0041\u0301': u'\u00C1', u'\u0045\u0301': u'\u00C9', u'\u0049\u0301': u'\u00CD', u'\u004F\u0301': u'\u00D3',
-    u'\u0055\u0301': u'\u00DA', u'\u0059\u0301': u'\u00DD', u'\u0061\u0301': u'\u00E1', u'\u0065\u0301': u'\u00E9',
-    u'\u0069\u0301': u'\u00ED', u'\u006F\u0301': u'\u00F3', u'\u0075\u0301': u'\u00FA', u'\u0079\u0301': u'\u00FD',
-    u'\u00C2\u0301': u'\u1EA4', u'\u00CA\u0301': u'\u1EBE', u'\u00D4\u0301': u'\u1ED0', u'\u00E2\u0301': u'\u1EA5',
-    u'\u00EA\u0301': u'\u1EBF', u'\u00F4\u0301': u'\u1ED1', u'\u0102\u0301': u'\u1EAE', u'\u0103\u0301': u'\u1EAF',
-    u'\u01A0\u0301': u'\u1EDA', u'\u01A1\u0301': u'\u1EDB', u'\u01AF\u0301': u'\u1EE8', u'\u01B0\u0301': u'\u1EE9',
+    '\u0041\u0301': '\u00C1', '\u0045\u0301': '\u00C9', '\u0049\u0301': '\u00CD', '\u004F\u0301': '\u00D3',
+    '\u0055\u0301': '\u00DA', '\u0059\u0301': '\u00DD', '\u0061\u0301': '\u00E1', '\u0065\u0301': '\u00E9',
+    '\u0069\u0301': '\u00ED', '\u006F\u0301': '\u00F3', '\u0075\u0301': '\u00FA', '\u0079\u0301': '\u00FD',
+    '\u00C2\u0301': '\u1EA4', '\u00CA\u0301': '\u1EBE', '\u00D4\u0301': '\u1ED0', '\u00E2\u0301': '\u1EA5',
+    '\u00EA\u0301': '\u1EBF', '\u00F4\u0301': '\u1ED1', '\u0102\u0301': '\u1EAE', '\u0103\u0301': '\u1EAF',
+    '\u01A0\u0301': '\u1EDA', '\u01A1\u0301': '\u1EDB', '\u01AF\u0301': '\u1EE8', '\u01B0\u0301': '\u1EE9',
 
-    u'\u0041\u0303': u'\u00C3', u'\u0045\u0303': u'\u1EBC', u'\u0049\u0303': u'\u0128', u'\u004F\u0303': u'\u00D5',
-    u'\u0055\u0303': u'\u0168', u'\u0059\u0303': u'\u1EF8', u'\u0061\u0303': u'\u00E3', u'\u0065\u0303': u'\u1EBD',
-    u'\u0069\u0303': u'\u0129', u'\u006F\u0303': u'\u00F5', u'\u0075\u0303': u'\u0169', u'\u0079\u0303': u'\u1EF9',
-    u'\u00C2\u0303': u'\u1EAA', u'\u00CA\u0303': u'\u1EC4', u'\u00D4\u0303': u'\u1ED6', u'\u00E2\u0303': u'\u1EAB',
-    u'\u00EA\u0303': u'\u1EC5', u'\u00F4\u0303': u'\u1ED7', u'\u0102\u0303': u'\u1EB4', u'\u0103\u0303': u'\u1EB5',
-    u'\u01A0\u0303': u'\u1EE0', u'\u01A1\u0303': u'\u1EE1', u'\u01AF\u0303': u'\u1EEE', u'\u01B0\u0303': u'\u1EEF',
+    '\u0041\u0303': '\u00C3', '\u0045\u0303': '\u1EBC', '\u0049\u0303': '\u0128', '\u004F\u0303': '\u00D5',
+    '\u0055\u0303': '\u0168', '\u0059\u0303': '\u1EF8', '\u0061\u0303': '\u00E3', '\u0065\u0303': '\u1EBD',
+    '\u0069\u0303': '\u0129', '\u006F\u0303': '\u00F5', '\u0075\u0303': '\u0169', '\u0079\u0303': '\u1EF9',
+    '\u00C2\u0303': '\u1EAA', '\u00CA\u0303': '\u1EC4', '\u00D4\u0303': '\u1ED6', '\u00E2\u0303': '\u1EAB',
+    '\u00EA\u0303': '\u1EC5', '\u00F4\u0303': '\u1ED7', '\u0102\u0303': '\u1EB4', '\u0103\u0303': '\u1EB5',
+    '\u01A0\u0303': '\u1EE0', '\u01A1\u0303': '\u1EE1', '\u01AF\u0303': '\u1EEE', '\u01B0\u0303': '\u1EEF',
 
-    u'\u0041\u0309': u'\u1EA2', u'\u0045\u0309': u'\u1EBA', u'\u0049\u0309': u'\u1EC8', u'\u004F\u0309': u'\u1ECE',
-    u'\u0055\u0309': u'\u1EE6', u'\u0059\u0309': u'\u1EF6', u'\u0061\u0309': u'\u1EA3', u'\u0065\u0309': u'\u1EBB',
-    u'\u0069\u0309': u'\u1EC9', u'\u006F\u0309': u'\u1ECF', u'\u0075\u0309': u'\u1EE7', u'\u0079\u0309': u'\u1EF7',
-    u'\u00C2\u0309': u'\u1EA8', u'\u00CA\u0309': u'\u1EC2', u'\u00D4\u0309': u'\u1ED4', u'\u00E2\u0309': u'\u1EA9',
-    u'\u00EA\u0309': u'\u1EC3', u'\u00F4\u0309': u'\u1ED5', u'\u0102\u0309': u'\u1EB2', u'\u0103\u0309': u'\u1EB3',
-    u'\u01A0\u0309': u'\u1EDE', u'\u01A1\u0309': u'\u1EDF', u'\u01AF\u0309': u'\u1EEC', u'\u01B0\u0309': u'\u1EED',
+    '\u0041\u0309': '\u1EA2', '\u0045\u0309': '\u1EBA', '\u0049\u0309': '\u1EC8', '\u004F\u0309': '\u1ECE',
+    '\u0055\u0309': '\u1EE6', '\u0059\u0309': '\u1EF6', '\u0061\u0309': '\u1EA3', '\u0065\u0309': '\u1EBB',
+    '\u0069\u0309': '\u1EC9', '\u006F\u0309': '\u1ECF', '\u0075\u0309': '\u1EE7', '\u0079\u0309': '\u1EF7',
+    '\u00C2\u0309': '\u1EA8', '\u00CA\u0309': '\u1EC2', '\u00D4\u0309': '\u1ED4', '\u00E2\u0309': '\u1EA9',
+    '\u00EA\u0309': '\u1EC3', '\u00F4\u0309': '\u1ED5', '\u0102\u0309': '\u1EB2', '\u0103\u0309': '\u1EB3',
+    '\u01A0\u0309': '\u1EDE', '\u01A1\u0309': '\u1EDF', '\u01AF\u0309': '\u1EEC', '\u01B0\u0309': '\u1EED',
 
-    u'\u0041\u0323': u'\u1EA0', u'\u0045\u0323': u'\u1EB8', u'\u0049\u0323': u'\u1ECA', u'\u004F\u0323': u'\u1ECC',
-    u'\u0055\u0323': u'\u1EE4', u'\u0059\u0323': u'\u1EF4', u'\u0061\u0323': u'\u1EA1', u'\u0065\u0323': u'\u1EB9',
-    u'\u0069\u0323': u'\u1ECB', u'\u006F\u0323': u'\u1ECD', u'\u0075\u0323': u'\u1EE5', u'\u0079\u0323': u'\u1EF5',
-    u'\u00C2\u0323': u'\u1EAC', u'\u00CA\u0323': u'\u1EC6', u'\u00D4\u0323': u'\u1ED8', u'\u00E2\u0323': u'\u1EAD',
-    u'\u00EA\u0323': u'\u1EC7', u'\u00F4\u0323': u'\u1ED9', u'\u0102\u0323': u'\u1EB6', u'\u0103\u0323': u'\u1EB7',
-    u'\u01A0\u0323': u'\u1EE2', u'\u01A1\u0323': u'\u1EE3', u'\u01AF\u0323': u'\u1EF0', u'\u01B0\u0323': u'\u1EF1',
+    '\u0041\u0323': '\u1EA0', '\u0045\u0323': '\u1EB8', '\u0049\u0323': '\u1ECA', '\u004F\u0323': '\u1ECC',
+    '\u0055\u0323': '\u1EE4', '\u0059\u0323': '\u1EF4', '\u0061\u0323': '\u1EA1', '\u0065\u0323': '\u1EB9',
+    '\u0069\u0323': '\u1ECB', '\u006F\u0323': '\u1ECD', '\u0075\u0323': '\u1EE5', '\u0079\u0323': '\u1EF5',
+    '\u00C2\u0323': '\u1EAC', '\u00CA\u0323': '\u1EC6', '\u00D4\u0323': '\u1ED8', '\u00E2\u0323': '\u1EAD',
+    '\u00EA\u0323': '\u1EC7', '\u00F4\u0323': '\u1ED9', '\u0102\u0323': '\u1EB6', '\u0103\u0323': '\u1EB7',
+    '\u01A0\u0323': '\u1EE2', '\u01A1\u0323': '\u1EE3', '\u01AF\u0323': '\u1EF0', '\u01B0\u0323': '\u1EF1',
 }
 re_vietnamese = re.compile(
-    u'[AEIOUYaeiouy\u00C2\u00CA\u00D4\u00E2\u00EA\u00F4\u0102\u0103\u01A0\u01A1\u01AF\u01B0][\u0300\u0301\u0303\u0309\u0323]')
-re_latin_cont = re.compile(u'([a-z\u00e0-\u024f])\\1{2,}')
-re_symbol_cont = re.compile(u'([^a-z\u00e0-\u024f])\\1{1,}')
+    '[AEIOUYaeiouy\u00C2\u00CA\u00D4\u00E2\u00EA\u00F4\u0102\u0103\u01A0\u01A1\u01AF\u01B0][\u0300\u0301\u0303\u0309\u0323]')
+re_latin_cont = re.compile('([a-z\u00e0-\u024f])\\1{2,}')
+re_symbol_cont = re.compile('([^a-z\u00e0-\u024f])\\1{1,}')
 
 
 def normalize_text(org):
@@ -288,10 +288,10 @@ def normalize_text(org):
     else:
         s = org
     s = htmlentity2unicode(s)
-    s = re.sub(u'[\u2010-\u2015]', '-', s)
-    s = re.sub(u'[0-9]+', '0', s)
-    s = re.sub(u'[^\u0020-\u007e\u00a1-\u024f\u0300-\u036f\u1e00-\u1eff]+', ' ', s)
-    s = re.sub(u'  +', ' ', s)
+    s = re.sub('[\u2010-\u2015]', '-', s)
+    s = re.sub('[0-9]+', '0', s)
+    s = re.sub('[^\u0020-\u007e\u00a1-\u024f\u0300-\u036f\u1e00-\u1eff]+', ' ', s)
+    s = re.sub('  +', ' ', s)
 
     # vietnamese normalization
     s = re_vietnamese.sub(lambda x: vietnamese_norm[x.group(0)], s)
@@ -303,7 +303,7 @@ def normalize_text(org):
     # s = s.lower()
 
     # Romanian normalization
-    s = s.replace(u'\u0219', u'\u015f').replace(u'\u021b', u'\u0163')
+    s = s.replace('\u0219', '\u015f').replace('\u021b', '\u0163')
 
     s = normalize_twitter(s)
     s = re_latin_cont.sub(r'\1\1', s)
@@ -344,7 +344,7 @@ def shuffle(idlist):
 # prediction probability
 def predict(param, events):
     import ipdb; ipdb.set_trace()
-    sum_w = numpy.dot(numpy.array([param[ei] for ei in events.keys()]).T, numpy.array(list(events.values())))
+    sum_w = numpy.dot(numpy.array([param[ei] for ei in list(events.keys())]).T, numpy.array(list(events.values())))
     exp_w = numpy.exp(sum_w - sum_w.max())
     return exp_w / exp_w.sum()
 
@@ -369,7 +369,7 @@ def inference(param, labels, corpus, idlist, trie, options):
     counts = numpy.zeros(K, dtype=int)
     for m, target in enumerate(shuffled_ids):
         label, text, _ = corpus[target]
-        events = trie.extract_features(u"\u0001" + text + u"\u0001")
+        events = trie.extract_features("\u0001" + text + "\u0001")
         label_k = labels.index(label)
 
         y = predict(param, events)
@@ -389,7 +389,7 @@ def inference(param, labels, corpus, idlist, trie, options):
             indexes = events
             if (N - m) % WHOLE_REG_INT == 1:
                 logger.info("full regularization: %d / %d" % (m, N))
-                indexes = range(M)
+                indexes = list(range(M))
             for id_index in indexes:
                 prm = param[id_index]
                 pnl = penalties[id_index]
@@ -414,7 +414,7 @@ def inference(param, labels, corpus, idlist, trie, options):
                             prm[j] = 0
                             pnl[j] -= w
         else:
-            for id_event, freq in events.items():
+            for id_event, freq in list(events.items()):
                 param[id_event,] -= y * freq
 
     for lbl, crct, cnt in zip(labels, corrects, counts):
@@ -444,7 +444,7 @@ def likelihood_file(param, labels, trie, filelist):
                 label_map[label] = -1
             label_k = label_map[label]
 
-            events = trie.extract_features(u"\u0001" + text + u"\u0001")
+            events = trie.extract_features("\u0001" + text + "\u0001")
             y = predict(param, events)
             predict_k = y.argmax()
 
@@ -490,7 +490,7 @@ def likelihood_text(param, labels, trie, text):
         label_map[label] = -1
     label_k = label_map[label]
 
-    events = trie.extract_features(u"\u0001" + text + u"\u0001")
+    events = trie.extract_features("\u0001" + text + "\u0001")
     
     y = predict(param, events)
     predict_k = y.argmax()

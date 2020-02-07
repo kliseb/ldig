@@ -5,7 +5,7 @@
 # (c)2012 Nakatani Shuyo / Cybozu Labs Inc.
 # (c) 2017 Demonchy Clement
 
-from __future__ import absolute_import, unicode_literals
+
 import unittest
 from ldig import da
 
@@ -14,16 +14,16 @@ class TestDoubleArray(unittest.TestCase):
         trie = da.DoubleArray(verbose=False)
         trie.initialize(["cat"])
         self.assertEqual(trie.N, 4)
-        self.assert_(trie.get("ca") is None)
-        self.assert_(trie.get("xxx") is None)
+        self.assertTrue(trie.get("ca") is None)
+        self.assertTrue(trie.get("xxx") is None)
         self.assertEqual(trie.get("cat"), 0)
 
     def test2(self):
         trie = da.DoubleArray()
         trie.initialize(["cat", "dog"])
         self.assertEqual(trie.N, 7)
-        self.assert_(trie.get("ca") is None)
-        self.assert_(trie.get("xxx") is None)
+        self.assertTrue(trie.get("ca") is None)
+        self.assertTrue(trie.get("xxx") is None)
         self.assertEqual(trie.get("cat"), 0)
         self.assertEqual(trie.get("dog"), 1)
 
@@ -31,12 +31,12 @@ class TestDoubleArray(unittest.TestCase):
         trie = da.DoubleArray(verbose=False)
         trie.initialize(["ca", "cat", "deer", "dog", "fox", "rat"])
         self.assertEqual(trie.N, 17)
-        self.assert_(trie.get("c") is None)
+        self.assertTrue(trie.get("c") is None)
         self.assertEqual(trie.get("ca"), 0)
         self.assertEqual(trie.get("cat"), 1)
         self.assertEqual(trie.get("deer"), 2)
         self.assertEqual(trie.get("dog"), 3)
-        self.assert_(trie.get("xxx") is None)
+        self.assertTrue(trie.get("xxx") is None)
 
     def test4(self):
         trie = da.DoubleArray()

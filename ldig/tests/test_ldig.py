@@ -5,7 +5,7 @@
 # This code is available under the MIT License.
 # (c)2012 Nakatani Shuyo / Cybozu Labs Inc.
 # (c) 2017 Demonchy Clement
-from __future__ import absolute_import, unicode_literals
+
 import unittest
 from ldig import ldig
 import os
@@ -17,22 +17,22 @@ class TestLdig(unittest.TestCase):
         self.assertEqual(ldig.normalize_text(org), ("", norm, org))
 
     def testNormalizeRT(self):
-        self.assertNormalize(u"RT RT RT RT RT I'm a Superwoman", u"I'm a superwoman")
+        self.assertNormalize("RT RT RT RT RT I'm a Superwoman", "I'm a superwoman")
 
     def testNormalizeLaugh(self):
-        self.assertNormalize(u"ahahahah", u"ahahah")
-        self.assertNormalize(u"hahha", u"haha")
-        self.assertNormalize(u"hahaa", u"haha")
-        self.assertNormalize(u"ahahahahhahahhahahaaaa", u"ahaha")
+        self.assertNormalize("ahahahah", "ahahah")
+        self.assertNormalize("hahha", "haha")
+        self.assertNormalize("hahaa", "haha")
+        self.assertNormalize("ahahahahhahahhahahaaaa", "ahaha")
 
     def testLowerCaseWithTurkish(self):
-        self.assertNormalize(u"I", u"I")
-        self.assertNormalize(u"İ", u"i")
-        self.assertNormalize(u"i", u"i")
-        self.assertNormalize(u"ı", u"ı")
+        self.assertNormalize("I", "I")
+        self.assertNormalize("İ", "i")
+        self.assertNormalize("i", "i")
+        self.assertNormalize("ı", "ı")
 
-        self.assertNormalize(u"Iİ", u"Ii")
-        self.assertNormalize(u"Iı", u"Iı")
+        self.assertNormalize("Iİ", "Ii")
+        self.assertNormalize("Iı", "Iı")
 
     def testDetectLangText(self):
         ldig_object = ldig.ldig()
