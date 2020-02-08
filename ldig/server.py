@@ -11,7 +11,7 @@ import urllib.parse
 import optparse
 import json
 import numpy
-from . import ldig
+import ldig
 
 #sys.stdout = codecs.getwriter('utf-8')(sys.stdout)
 
