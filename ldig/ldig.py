@@ -9,7 +9,7 @@ import os, sys, re, codecs, json
 import optparse
 import numpy
 import subprocess
-from ldig import da
+import da
 import logging
 from typing import Tuple, List
 import zipfile
